@@ -5,6 +5,7 @@
 *.so
 *.dylib
 *.sum
+.idea
 key.txt
 SeznamSlovnikBot
 # Test binary, built with `go test -c`

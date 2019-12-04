@@ -1,12 +1,45 @@
 package main
 
 import (
-	"log"
-	"time"
 	"flag"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	_ "github.com/PuerkitoBio/goquery"
 	tb "gopkg.in/tucnak/telebot.v2"
+	"log"
+	"net/http"
+	"time"
 )
+
+
+func getTranslation(lang string, query string) string {
+	// Request the HTML page.
+	fmt.Println("https://slovnik.seznam.cz/preklad/rusky_cesky/" + query)
+	res, err := http.Get("https://slovnik.seznam.cz/preklad/rusky_cesky/" + query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Find the review items
+	doc.Find(".Box-content-line").Each(func(i int, s *goquery.Selection) {
+		// For each item found, get the band and title
+		translation := s.Find("a").Text()
+		fmt.Println(translation)
+	})
+
+	return ""
+}
+
 
 func main() {
 
@@ -26,8 +59,9 @@ func main() {
 		return
 	}
 
-	b.Handle("/hello", func(m *tb.Message) {
-		b.Send(m.Sender, "hello world")
+	b.Handle("/cz", func(m *tb.Message) {
+		getTranslation("cz", m.Payload)
+		//b.Send(m.Sender, "Echo:" + m.Payload)
 	})
 
 	b.Start()
