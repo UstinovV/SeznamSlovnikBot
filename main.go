@@ -12,7 +12,7 @@ import (
 )
 
 
-func getTranslation(lang string, query string) string {
+func getTranslationHTML(lang string, query string) string {
 	// Request the HTML page.
 	fmt.Println("https://slovnik.seznam.cz/preklad/rusky_cesky/" + query)
 	res, err := http.Get("https://slovnik.seznam.cz/preklad/rusky_cesky/" + query)
@@ -41,6 +41,25 @@ func getTranslation(lang string, query string) string {
 }
 
 
+func getTranslationJSON(lang string, query string) string {
+	// Request the HTML page.
+	res, err := http.Get("https://slovnik.seznam.cz/api/slovnik?dictionary=ru_cz&query=%D1%81%D0%BB%D0%BE%D0%B2%D0%BE")
+
+	fmt.Println("https://slovnik.seznam.cz/api/slovnik?dictionary=ru_cz&query=" + query)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+
+	fmt.Println(res)
+
+	return ""
+}
+
+
 func main() {
 
 	var botKey string
@@ -60,7 +79,7 @@ func main() {
 	}
 
 	b.Handle("/cz", func(m *tb.Message) {
-		getTranslation("cz", m.Payload)
+		getTranslationJSON("cz", m.Payload)
 		//b.Send(m.Sender, "Echo:" + m.Payload)
 	})
 
